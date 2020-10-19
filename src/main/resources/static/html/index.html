@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <script language="JavaScript" src="/js/jquery-3.5.1.js"></script>
+    <script language="JavaScript" src="/js/jquery-3.5.1.min.js"></script>
+    <title>二维码</title>
+</head>
+<body>
+<h1><center>公众号二维码</center></h1>
+<center><img id="qrcode" src=""></center>
+</body>
+<script type="text/javascript">
+    var timestamp = new Date().getTime() + "";
+    var str = timestamp.substring(timestamp.length-10, timestamp.length);
+    str=str.replace(/\b(0+)/gi,"");
+    $.ajax({
+        type: "get",
+        url : "/wechat/test",
+        data: "sceneId="+str,
+        success: function(data){
+            document.images.qrcode.src=data;
+            //alert('str:'+str);
+        },
+        error: function(data, textStatus, errorThrown){
+            alert('error:'+data);
+        }
+    });
+    //每3秒查询数据库是否已记录sceneid
+    setInterval(getSceneId, 3000);
+    function getSceneId() {
+        $.ajax({
+            type: "get",
+            url : "/wechat/getSceneId",
+            data: "sceneId="+str,
+            success: function(data){
+                if(data==1){
+                    removeSceneId();
+                    window.location.href = "http://www.teemlink.com/experience/";
+                }
+                //alert('data:'+data);
+            },
+        });
+    }
+
+    //清除内存
+    function removeSceneId() {
+        $.ajax({
+            type: "get",
+            url : "/wechat/removeSceneId",
+            data: "sceneId="+str,
+        });
+    }
+</script>
+</html>
